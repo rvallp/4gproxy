@@ -161,3 +161,6 @@ We provides the following valid conditions:
 | dymp       | 0   1              | Set to 1 to get only dynamic proxies listed on the external proxies page.                                                                                   |
 | deviceport | 50001              | Set to a specific port number to access a specified proxy device.                                                                                          |
 | iptype     | 4    6             | Set to 4 to get only IPv4 addresses. Set to 6 to get only IPv6 addresses.                                                                                  |
+
+## Resell proxies
+You may have unused data on other platform's proxies. With Allproxy, you can resell this data. We offer rich access control features like user management, plans, whitelists/blacklists. We can provide SOCKS5 access even if your proxy doesn't support it.
