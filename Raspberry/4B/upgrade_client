@@ -1,0 +1,16 @@
+#!/bin/bash
+
+curTime=$(date "+%Y%m%d%H%M%S")
+
+echo "Updating the Raspberry allproxy client $curTime"
+curl -O -k  https://raw.githubusercontent.com/xapanyun/4gproxy/master/Raspberry/4B/allproxyclient
+
+
+echo "backup the original client"
+cp /home/pi/allproxyClient/allproxyC ./allproxyC.bak_$curTime
+
+echo "overwirte with the new client"
+mv -f allproxyclient /home/pi/allproxyClient/allproxyC
+
+echo "set execute permission to script"
+chmod +x /home/pi/allproxyClient/allproxyC

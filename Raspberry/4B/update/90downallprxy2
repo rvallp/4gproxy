@@ -1,0 +1,14 @@
+#!/bin/bash
+
+curTime=$(date "+%Y-%m-%d - %H:%M:%S")
+echo "post down at $curTime for $IFACE" >> /tmp/1.log
+
+delRuleTbl(){
+	local currIFace=$1
+	local roTb="$(/root/allproxyClient/nextNum -q $currIFace)"
+	ip ru del ta $roTb
+}
+
+delRuleTbl $IFACE
+
+exit 0

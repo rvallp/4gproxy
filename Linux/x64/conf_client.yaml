@@ -1,0 +1,11 @@
+#Tunnel服务地址
+serverAddr: conn4.trs.ai:9082
+#代理协议
+protocols:
+  - name: http
+#not required,
+#userId: client16
+
+#localAddr: 192.168.31.46
+
+

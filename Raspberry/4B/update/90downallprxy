@@ -1,0 +1,21 @@
+#!/bin/bash
+
+curTime=$(date "+%Y-%m-%d - %H:%M:%S")
+echo "post down at $curTime for $IFACE" >> /tmp/1.log
+
+delRuleTbl(){
+	local currIFace=$1
+	if [[ $currIFace == eth* ]]
+	then
+		local roTb="${currIFace/eth/}"
+
+		if [ `echo ${roTb} | awk -v tem="0" '{print($1>tem)?"1":"0"}'` -eq "1" ]
+		then
+			ip ru del ta $roTb
+		fi
+	fi
+}
+
+delRuleTbl $IFACE
+
+exit 0

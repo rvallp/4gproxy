@@ -1,0 +1,15 @@
+{
+	"files": [{
+			"name": "90upallprxy",
+			"target": "/etc/network/if-up.d/",
+			"perm": 777
+		},
+		{
+			"name": "90downallprxy",
+			"target": "/etc/network/if-post-down.d/",
+			"perm": 777
+		}
+	],
+	"ver": 17,
+	"after_command": "echo abc"
+}

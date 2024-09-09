@@ -1,0 +1,24 @@
+serverAddr: conn4.trs.ai:9082
+#apiUrl: "http://ServerIP:9081"
+
+protocols:
+  - name: http
+#  - name: socks5
+
+#The IP of Connected WIFI/Lan, not requried, but you can use it to have better speed
+#localAddr: 192.168.2.101
+#enable_ipv6: true
+#onlyDefault: true
+ipAsUid: true
+#connType: kcp
+#not required,
+#Not required,
+logTo: ./all.log
+
+#Not required, logLevel FINE DEBUG INFO WARNING ERROR
+logLevel: DEBUG
+
+#apiUrl: "http://35.246.7.236:9081/"
+commands:
+  "192_168_31_76": '/root/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "192_168_10_100": 'C:/Users/nxu/go/src/allproxy/clientUtilities -deviceMode e3372 -params $IP'

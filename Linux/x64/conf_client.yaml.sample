@@ -1,0 +1,29 @@
+#required, TunnelAddress
+serverAddr: conn4.trs.ai:9082
+#required, proxy protocol
+protocols:
+  - name: http
+    auth: user2:pwd2,user3:pwd1
+  - name: socks5
+    auth: user2:pwd2,user3:pwd1
+
+
+#not required,
+userId: client16
+
+#Not required,
+logTo: ./all.log
+
+#Not required, logLevel FINE DEBUG INFO WARNING ERROR
+logLevel: DEBUG
+
+#not required, only use if you have multiple network
+#interfaces in this machine, and then specify the address
+#which you want comminucate with allproxy server
+localAddr: 192.168.2.100
+
+email: a@qq.com
+
+apiUrl: "http://176.122.182.168:9081/"
+commands:
+  "eth2": 'C:\Users\clientUtilities\windows\x64\clientUtilities.exe -deviceMode e3372 -params $IP'

@@ -1,0 +1,35 @@
+serverAddr: XXXXXXX:9082
+protocols:
+  - name: http
+#  - name: socks5
+#not required,
+#userId: client16
+
+#localAddr: 192.168.8.100
+
+apiUrl: "http://XXXXXXX:9081/"
+commands:
+  "eth1": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth2": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth3": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth4": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'  
+  "eth5": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth6": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth7": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth8": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth9": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth10": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth11": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth12": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'  
+  "eth13": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth14": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth15": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth16": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth17": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth18": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth19": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'  
+  "eth20": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth21": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth22": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth23": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'
+  "eth24": '~/allproxyClient/clientUtilities -deviceMode e3276 -params $IP -command reboot'

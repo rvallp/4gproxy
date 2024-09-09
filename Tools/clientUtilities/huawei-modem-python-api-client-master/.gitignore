@@ -1,0 +1,15 @@
+.idea
+venv
+gw.py
+analysis.py
+
+*.csv
+*.pyc
+
+initial_skip
+
+dist/*
+*.egg-info
+
+coverage.xml
+.coverage

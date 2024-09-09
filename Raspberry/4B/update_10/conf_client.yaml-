@@ -1,0 +1,36 @@
+#Tunnel服务地址
+serverAddr: ip.amzdoor.com:9082
+#代理协议
+protocols:
+  - name: http
+#not required,
+#userId: client16
+
+#localAddr: 192.168.8.100
+
+apiUrl: "http://ip.amzdoor.com:9081"
+commands:
+  "eth1": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth2": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth3": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth4": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'  
+  "eth5": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth6": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth7": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth8": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth9": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth10": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth11": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth12": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'  
+  "eth13": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth14": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth15": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth16": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth17": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth18": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth19": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'  
+  "eth20": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth21": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth22": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth23": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'
+  "eth24": '/home/pi/allproxyClient/clientUtilities -deviceMode e3276 -params $IP'

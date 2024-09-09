@@ -1,0 +1,28 @@
+#!/bin/bash
+
+curTime=$(date "+%Y%m%d%H%M%S")
+echo "Updating the Raspberry script $curTime"
+
+
+curl -o 90upallprxy -k https://raw.githubusercontent.com/xapanyun/4gproxy/master/Raspberry/4B/update/90upallprxy
+
+echo "backup the original script"
+cp /etc/network/if-up.d/90upallprxy ./90upallprxy.bak_$curTime
+
+echo "overwirte with the new script"
+mv -f 90upallprxy /etc/network/if-up.d/
+
+echo "set execute permission to script"
+chmod +x /etc/network/if-up.d/90upallprxy
+
+
+curl -o 90downallprxy -k https://raw.githubusercontent.com/xapanyun/4gproxy/master/Raspberry/4B/update/90downallprxy
+
+echo "backup the original script"
+cp /etc/network/if-post-down.d/90downallprxy ./90downallprxy.bak_$curTime
+
+echo "overwirte with the new script"
+mv -f 90downallprxy /etc/network/if-post-down.d/
+
+echo "set execute permission to script"
+chmod +x /etc/network/if-post-down.d/90downallprxy

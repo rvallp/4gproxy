@@ -1,0 +1,37 @@
+#!/bin/bash
+
+curTime=$(date "+%Y-%m-%d - %H:%M:%S")
+echo "up at $curTime for $IFACE" >> /tmp/1.log
+
+
+addRuleTbl(){
+    local currIFace=$1
+   
+    if [ "$currIFace" == "eth0" ] || [ "$currIFace" == "lo" ] || [ "$currIFace" == "wlan0" ] || [ "$currIFace" == "--all" ]
+	then
+	  echo "Ignore $IFACE" >> /tmp/1.log
+	  return 0
+	fi
+   
+	local ethIp=`ifconfig $currIFace | grep "inet" | awk 'NR==1{print $2}'`
+	#local ethIp="192.168.9.100"
+
+	local ipArr=(${ethIp//./ })
+	local subNet=${ipArr[2]}
+
+	local gwIp="192.168.$subNet.1"
+
+	#roTb=$subNet
+	local roTb="$(/root/allproxyClient/nextNum -q $currIFace)"
+
+	## add or change route to HA
+	local EXIST=`ip ro show ta ${roTb}| wc -l`
+	if [ $EXIST -eq 0 ]
+	then
+	  ip ru add from $ethIp lookup $roTb
+	  ip ro add default via $gwIp ta $roTb
+	fi
+}
+
+addRuleTbl $IFACE
+exit 0

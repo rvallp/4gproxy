@@ -1,0 +1,41 @@
+#!/bin/bash
+
+curTime=$(date "+%Y-%m-%d - %H:%M:%S")
+echo "up at $curTime for $IFACE" >> /tmp/1.log
+
+
+addRuleTbl(){
+    local currIFace=$1
+   
+   
+	local ethIp=`ifconfig $currIFace | grep "inet" | awk 'NR==1{print $2}'`
+	#local ethIp="192.168.9.100"
+
+	local ipArr=(${ethIp//./ })
+	local subNet=${ipArr[2]}
+
+	local gwIp="192.168.$subNet.1"
+
+
+
+
+	if [[ $currIFace == eth* ]]
+	then
+		#roTb=$subNet
+		local roTb="${currIFace/eth/}"
+
+		if [ `echo ${roTb} | awk -v tem="0" '{print($1>tem)?"1":"0"}'` -eq "1" ]
+		then
+		    ## add or change route to HA
+            local EXIST=`ip ro show ta ${roTb}| wc -l`
+            if [ $EXIST -eq 0 ]
+			then
+			  ip ru add from $ethIp lookup $roTb
+			  ip ro add default via $gwIp ta $roTb
+			fi
+		fi
+	fi
+}
+
+addRuleTbl $IFACE
+exit 0
