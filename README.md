@@ -1,20 +1,26 @@
 ## Contact me
-1. If you want to use your self allproxy server to make better security and speed, pls feel free to contact me by telegram: https://t.me/allproxyofficial
-2. Official news channel: https://t.me/allproxypub
+1. To enhance your online security and improve browsing speed, consider setting up your own allproxy server. For personalized assistance and guidance, please feel free to reach out to me via Telegram at https://t.me/allproxyofficial. I'll be happy to help you get started and optimize your allproxy server configuration.
+2. Stay informed about the latest updates, news, and announcements related to allproxy by joining our official news channel on Telegram: https://t.me/allproxypub. By subscribing to this channel, you'll have access to timely information and valuable insights to make the most of your allproxy experience.
 
 
-## Install the server application file
-The self deployed server is just for paid users, it provides more control and features to the users.
-1. Contract me to get a paid lic
-2. Use the correct lic in conf_svr.yaml
-3. Deploy it by the shell script "install.sh"
+## Install the server application files
+For paid users, we offer the option to deploy your own allproxy server, providing you with enhanced control and additional features. To set up your self-hosted allproxy server, please follow these steps:
+
+1. Contact me to obtain a paid license. I'll guide you through the process and provide you with the necessary license key.
+2. Once you have your license key, open the conf_svr.yaml file and insert the license key in the designated location. Ensure that the license key is entered correctly to avoid any deployment issues.
+3. To deploy your allproxy server, run the shell script named install.sh. This script will handle the installation and configuration process, making it easy for you to set up your server.
 
 ## How to build youself 4g proxies
 
-Allproxy provides a easy to make your 4g proxy, it suporrts most of platform, and easy to use.
-And th PC client will create proxy for each your network adapter, it means if you plugged 4g dongles in PC, you will get 4g proxy of it.
+Allproxy offers a user-friendly solution to create your own 4G proxy server, making it accessible to users across various platforms. With its straightforward approach, setting up and utilizing your 4G proxy has never been easier.
 
-The following video is for the old version, but you can also take a view.
+One of the standout features of the Allproxy PC client is its ability to create a proxy for each network adapter connected to your computer. This means that if you have multiple 4G dongles plugged into your PC, the client will generate a dedicated 4G proxy for each dongle. This functionality provides you with the flexibility to manage and utilize your 4G connections efficiently.
+
+While the following video showcases an older version of Allproxy, it still provides valuable insights into usage process. We recommend taking a few minutes to watch the video, as it will give you a good overview of how Allproxy works and how you can leverage its capabilities to establish your own 4G proxy server.
+
+Please note that the current version of Allproxy may have additional features and improvements compared to the one shown in the video. However, the core functionality and ease of use remain the same, ensuring a smooth experience for all users.
+
+If you have any further questions or require assistance with setting up your Allproxy 4G proxy server, please don't hesitate to reach out. Our support team is ready to help you every step of the way.
 
 [![NewVersion2023](https://img.youtube.com/vi/NGSKZLOzJwk/0.jpg)](https://www.youtube.com/watch?v=NGSKZLOzJwk)
 
@@ -22,14 +28,20 @@ The following video is for the old version, but you can also take a view.
 [![PC GUI Client](https://img.youtube.com/vi/fTCktSV2Oyo/0.jpg)](https://www.youtube.com/watch?v=fTCktSV2Oyo)
 
 ## Android
-1. Download and Install allproxy app from google play.
-2. Click connect button, you will get a proxy address, your phone network is published with this address.
+1. Download and install the Allproxy app from the Google Play Store.
+2. Open the app and click the "Connect" button. You will receive a proxy address, which publishes your phone's network.
 ---
 You can use our sample project(SDK/Android/sample_project) to see how it is simple to build a android proxy.
 
 ## 4g Dongles
 1. We had just tested with Huawei E3372, E8372, E3276,CLR900A
 2. It should also works with others, but we need to write script to do IP refresh on the other devices.
+
+## Openwrt or other Linux devices
+1. Download the appropriate allproxyC version for your device's CPU.
+2. Change the server address in conf_client.yaml or just use our free server
+2. Run allproxyC in the background.
+3. Configure allproxyC to autostart for optimal performance.
    
 ## Raspberry PI
 1. I just tested with Huawei E3372, the configurations may need changes for other devices.
@@ -43,7 +55,7 @@ You can use our sample project(SDK/Android/sample_project) to see how it is simp
 
 You can also install it with the following command:
 ```
-wget https://nxu_xa.coding.net/p/allp/d/allp/git/raw/master/Linux/N1/install.sh
+wget https://raw.githubusercontent.com/rvallp/4gproxy/master/Script/install.sh
 chmod +x install.sh
 sudo ./install.sh
 ```
@@ -56,7 +68,7 @@ sudo ./install.sh
 It will generate a file "proxy.info" in the working directory, which contains the proxies infomation, the content likes:
 ```
 {"proxies":
-{"d3a849f6c55ea765058bc72ded1cfd91":{"connectedAt":"2019-09-03 14:08:08 +0800","proxyUrl":"http://192.168.2.100:53636"},"6d5ada3b1b0f9fadde94c6dc081dba69":{"connectedAt":"2019-09-03 14:08:08 +0800","proxyUrl":"http://192.168.2.100:53625"}}}
+{"d3a849f6c55ea765058bc72ded1cfd91":{"connectedAt":"2019-09-03 14:08:08 +0800","proxyUrl":"http://192.168.10.100:53636"},"6d5ada3b1b0f9fadde94c6dc081dba69":{"connectedAt":"2019-09-03 14:08:08 +0800","proxyUrl":"http://192.168.10.100:53625"}}}
 ```
 
 ## Install PC client as service
@@ -137,3 +149,15 @@ We provides the following valid conditions:
 6. isp e.g: isp--t-mobile  , pls remove the "space" in isp name
 7. session  e.g: session--1,  you can use any unique id as session value, it will fix the proxy
 8. fixsession, same as session, just one difference, it will no response if the ip of session is invalid
+
+| Name       | Sample Value       | Desc                                                                                                                                                        |
+|------------|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| country    | us                 | Set to "us" to get an IP from the United States.                                                                                                           |
+| state      | oh                 | Set to "oh" to get an IP from the state of Ohio.                                                                                                           |
+| isp        | SprintComminucations | Part of ISP name,Set to "SprintCommunications" to get an IP from the Sprint Communications ISP.                                                           |
+| session    | 12345 or 12345_10m | Set to "12345" to get a fixed IP for the session. You can also specify an expiration time, e.g., "12345_10m" for a 10-minute session.                      |
+| fixsession | 12345 or 12345_10m | Similar to "session". If the IP of the session is dropped, "session" will switch to a new IP, but "fixsession" will get an access error.                   |
+| mobile     | 0   1              | Set to 1 to get only mobile IPs.                                                                                                                           |
+| dymp       | 0   1              | Set to 1 to get only dynamic proxies listed on the external proxies page.                                                                                   |
+| deviceport | 50001              | Set to a specific port number to access a specified proxy device.                                                                                          |
+| iptype     | 4    6             | Set to 4 to get only IPv4 addresses. Set to 6 to get only IPv6 addresses.                                                                                  |
