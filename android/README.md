@@ -1,3 +1,6 @@
+## Ver172
+Fixed issue for dual network if data network is not stable.
+
 ## Ver171
 Added more network info which can display in dashboard.
 
