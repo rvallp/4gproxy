@@ -28,10 +28,14 @@ If you have any further questions or require assistance with setting up your All
 [![PC GUI Client](https://img.youtube.com/vi/fTCktSV2Oyo/0.jpg)](https://www.youtube.com/watch?v=fTCktSV2Oyo)
 
 ## Android
-1. Download and install the Allproxy app from the Google Play Store.
+1. Download and install the latest Allproxy app from [this repository](https://github.com/rvallp/4gproxy/tree/master/android).
 2. Open the app and click the "Connect" button. You will receive a proxy address, which publishes your phone's network.
 ---
-You can use our sample project(SDK/Android/sample_project) to see how it is simple to build a android proxy.
+3. You can use our sample project(SDK/Android/sample_project) to see how it is simple to build a android proxy.
+4. If you enable the "Always keep data on" option on your phone, you can use both Wi-Fi and 4G/5G as your proxy.
+
+![Dual Network](https://blog.allproxy.io/wp-content/uploads/2024/09/image-4.png)
+
 
 ## 4g Dongles
 1. We had just tested with Huawei E3372, E8372, E3276,CLR900A

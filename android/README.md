@@ -1,5 +1,6 @@
-## Ver172
-Fixed issue for dual network if data network is not stable.
+## Ver179
+1. Fixed issue for dual network if data network is not stable.
+2. Allows make wifi as proxy if works in wifi split mode
 
 ## Ver171
 Added more network info which can display in dashboard.
