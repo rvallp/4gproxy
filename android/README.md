@@ -1,5 +1,5 @@
-## Ver179
-1. Fixed issue for dual network if data network is not stable.
+## Ver180
+1. Resolved dual network feature compatibility issue on Android 10 and later versions.
 2. Allows make wifi as proxy if works in wifi split mode
 
 ## Ver171
