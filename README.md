@@ -33,9 +33,11 @@ If you have any further questions or require assistance with setting up your All
 ---
 3. You can use our sample project(SDK/Android/sample_project) to see how it is simple to build a android proxy.
 4. If you enable the "Always keep data on" option on your phone, you can use both Wi-Fi and 4G/5G as your proxy.
+5. You can use WIFI split feature to speed up the proxy speed and save data traffic.
 
 ![Dual Network](https://blog.allproxy.io/wp-content/uploads/2024/09/image-4.png)
 
+![Wifi Split](https://blog.allproxy.io/wp-content/uploads/2024/09/image-5.png)
 
 ## 4g Dongles
 1. We had just tested with Huawei E3372, E8372, E3276,CLR900A
