@@ -11,14 +11,14 @@ For the bug fixing reason, I had updated some script or clien of PI, too save ou
 
 ## Update 1
 ```
-curl -o upgrade_ifscpt -k https://raw.githubusercontent.com/xapanyun/4gproxy/master/Raspberry/4B/upgrade_ifscpt
+curl -o upgrade_ifscpt -k https://raw.githubusercontent.com/rvallp/4gproxy/master/Raspberry/4B/upgrade_ifscpt
 chmod +x upgrade_ifscpt
 sudo ./upgrade_ifscpt
 ```
 
 ## Update 2
 ```
-curl -o upgrade_client -k https://raw.githubusercontent.com/xapanyun/4gproxy/master/Raspberry/4B/upgrade_client
+curl -o upgrade_client -k https://raw.githubusercontent.com/rvallp/4gproxy/master/Raspberry/4B/upgrade_client
 chmod +x upgrade_client
 sudo ./upgrade_client
 ```
@@ -28,7 +28,7 @@ supports huawei E8372
 1. navigate to ~/allproxyClient
 2. download client tool
 ```
-curl -O -k https://raw.githubusercontent.com/xapanyun/4gproxy/master/Tools/clientUtilities/linux/arm/clientUtilities
+curl -O -k https://raw.githubusercontent.com/rvallp/4gproxy/master/Tools/clientUtilities/linux/arm/clientUtilities
 
 ```
 3. The command for e3372 is
