@@ -3,7 +3,7 @@
 curTime=$(date "+%Y%m%d%H%M%S")
 
 echo "Updating the Raspberry allproxy client $curTime"
-curl -O -k  https://raw.githubusercontent.com/xapanyun/4gproxy/master/Raspberry/4B/allproxyclient
+curl -O -k  https://raw.githubusercontent.com/rvallp/4gproxy/master/Raspberry/4B/allproxyclient
 
 
 echo "backup the original client"

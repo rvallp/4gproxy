@@ -1,5 +1,5 @@
 #Tunnel服务地址
-serverAddr: ip.amzdoor.com:9082
+serverAddr: XXXXXX:9082
 #代理协议
 protocols:
   - name: http
@@ -8,7 +8,7 @@ protocols:
 
 #localAddr: 192.168.8.100
 
-apiUrl: "http://ip.amzdoor.com:9081"
+apiUrl: "http://XXXXXX:9081"
 commands:
   "eth1": '/home/pi/allproxyClient/clientUtilities -deviceMode e8372 -params $IP#admin#admin123'
   "eth2": '/home/pi/allproxyClient/clientUtilities -deviceMode e8372 -params $IP#admin#admin123'
