@@ -5,7 +5,7 @@ curTime=$(date "+%Y%m%d%H%M%S")
 #arm x64
 arch="x64"
 
-baseUrl=https://raw.githubusercontent.com/xapanyun/4gproxy/master
+baseUrl=https://raw.githubusercontent.com/rvallp/4gproxy/master
 #baseUrl=https://nxu_xa.coding.net/p/allp/d/allp/git/raw/master
 
 allpDir="/root/allproxyClient"
