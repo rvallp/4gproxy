@@ -33,6 +33,9 @@ A tool which can change the DHCP of huaweiE3372
 ## proxyTester (For windows only)
 A tool which supports http and socks5 proxy verification
 
+## performanTest (Both Linux and Windows)
+A tool for proxy performance testing, you can specify proxy address, url, concurrent, minutes.
+
 ## wpa_cli
 Android wifi debug tool
 
