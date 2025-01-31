@@ -1,3 +1,6 @@
+## Ver182
+The unique id generation method had been changed on last version, but it means the device ports will be changed, so reverted it from this version.
+
 ## Ver181
 Fixed bug 
 
