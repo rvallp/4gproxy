@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Set default username
+# Set default values
 DEFAULT_USERNAME="admin"
 DEFAULT_PWD="admin"
 DEFAULT_DIR="/root/allproxyS"
@@ -8,110 +8,126 @@ DEFAULT_DIR="/root/allproxyS"
 SPDIR="/etc/"
 SPCONFDIR="/etc/supervisor.d/"
 
-# Prompt for username
+# Prompt for directory and username/password with defaults
 read -p "Enter allproxy directory [default is $DEFAULT_DIR]: " ALLPDIR
 ALLPDIR=${ALLPDIR:-$DEFAULT_DIR}
 
-# Prompt for username
 read -p "Enter username [default is $DEFAULT_USERNAME]: " USERNAME
-
-# Use default username if input is empty
 USERNAME=${USERNAME:-$DEFAULT_USERNAME}
 
-read -p "Enter username [default is $DEFAULT_PWD]: " USERPWD
+read -p "Enter password [default is $DEFAULT_PWD]: " USERPWD
 USERPWD=${USERPWD:-$DEFAULT_PWD}
 
-# Check if the system is Ubuntu or CentOS
-if [ -f /etc/lsb-release ]; then
-  OS="Ubuntu"
-  SPDIR="/etc/supervisor/"
-  SPCONFDIR="/etc/supervisor/conf.d/"
-  CON_NAME="allproxyS.conf"
+# Detect OS
+if [ -f /etc/lsb-release ] || [ -f /etc/debian_version ]; then
+    if [ -f /etc/lsb-release ]; then
+        OS="Ubuntu"
+        SPDIR="/etc/supervisor/"
+        SPCONFDIR="/etc/supervisor/conf.d/"
+        CON_NAME="allproxyS.conf"
+    else
+        OS="Debian"
+        SPDIR="/etc/supervisor/"
+        SPCONFDIR="/etc/supervisor/conf.d/"
+        CON_NAME="allproxyS.conf"
+    fi
 elif [ -f /etc/redhat-release ]; then
-  sudo yum install -y epel-release
-  OS="CentOS"
-  CON_NAME="allproxyS.ini"
+    OS="CentOS"
+    CON_NAME="allproxyS.ini"
+    sudo yum install -y epel-release
 else
-  echo "This script is only compatible with Ubuntu and CentOS systems."
-  exit 1
+    echo "This script is only compatible with Ubuntu, Debian, and CentOS systems."
+    exit 1
 fi
 
-# Update the package list and upgrade existing packages
-if [ "$OS" == "Ubuntu" ]; then
-  sudo apt-get update
-  sudo apt-get upgrade -y
-  sudo apt-get install -y gnupg
-elif [ "$OS" == "CentOS" ]; then
-  sudo yum update -y
-fi
+# Update package list and upgrade
+case "$OS" in
+    "Ubuntu"|"Debian")
+        sudo apt-get update
+        sudo apt-get upgrade -y
+        sudo apt-get install -y gnupg
+        ;;
+    "CentOS")
+        sudo yum update -y
+        ;;
+esac
 
-# Import the MongoDB public key
-if [ "$OS" == "Ubuntu" ]; then
-  wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
-elif [ "$OS" == "CentOS" ]; then
-  sudo rpm --import https://www.mongodb.org/static/pgp/server-5.0.asc
-fi
+# Install MongoDB
+case "$OS" in
+    "Ubuntu")
+        wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+        echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+        ;;
+    "Debian")
+        wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+        echo "deb http://repo.mongodb.org/apt/debian $(lsb_release -cs)/mongodb-org/5.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+        ;;
+    "CentOS")
+        sudo rpm --import https://www.mongodb.org/static/pgp/server-5.0.asc
+        echo -e "[mongodb-org-5.0]\nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/redhat/7Server/mongodb-org/5.0/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://www.mongodb.org/static/pgp/server-5.0.asc" | sudo tee /etc/yum.repos.d/mongodb-org-5.0.repo
+        ;;
+esac
 
-# Create a list file for MongoDB
-if [ "$OS" == "Ubuntu" ]; then
-  echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
-  sudo apt-get update
-  sudo apt-get install -y mongodb-org
-elif [ "$OS" == "CentOS" ]; then
-  echo -e "[mongodb-org-5.0]\nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/redhat/7Server/mongodb-org/5.0/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://www.mongodb.org/static/pgp/server-5.0.asc" | sudo tee /etc/yum.repos.d/mongodb-org-5.0.repo
-  sudo yum install -y mongodb-org
-fi
+# Install MongoDB package
+case "$OS" in
+    "Ubuntu"|"Debian")
+        sudo apt-get update
+        sudo apt-get install -y mongodb-org
+        ;;
+    "CentOS")
+        sudo yum install -y mongodb-org
+        ;;
+esac
 
-# Start the MongoDB service and enable it to start on boot
+# Start MongoDB service
 sudo systemctl start mongod
 sudo systemctl enable mongod
 
 # Install Supervisor
-if [ "$OS" == "Ubuntu" ]; then
-  sudo apt-get install -y supervisor
-elif [ "$OS" == "CentOS" ]; then
-  sudo yum install -y supervisor
-fi
+case "$OS" in
+    "Ubuntu"|"Debian")
+        sudo apt-get install -y supervisor
+        ;;
+    "CentOS")
+        sudo yum install -y supervisor
+        ;;
+esac
 
+# Create Supervisor configuration
+sudo mkdir -p "$SPCONFDIR"  # Ensure directory exists
+cat << EOF | sudo tee "$SPCONFDIR/$CON_NAME"
+[program:allproxyS]
+directory=$ALLPDIR
+command=$ALLPDIR/allproxyS_x
+user=root
+stopsignal=INT
+autostart=true
+autorestart=true
+startretries=3
+stderr_logfile=/var/log/allproxys.err.log
+stdout_logfile=/var/log/allproxys.out.log
+EOF
 
-
-# Create the default application configuration file for Supervisor
-sudo echo -e "[program:allproxyS]\ndirectory=/root/allproxyS\ncommand=/root/allproxyS/allproxyS_x\nuser=root\nstopsignal=INT\nautostart=true\nautorestart=true\nstartretries=3\nstderr_logfile=/var/log/allproxys.err.log\nstdout_logfile=/var/log/allproxys.out.log" > $SPCONFDIR/$CON_NAME
-
-#change minfds
-#!/bin/bash
-
-# Check if "minfds=200000" already exists in "supervisord.conf"
-if grep -q "minfds=200000" /etc/supervisor/supervisord.conf; then
+# Configure supervisor minfds
+if ! grep -q "minfds=200000" /etc/supervisor/supervisord.conf 2>/dev/null; then
+    sudo cp /etc/supervisor/supervisord.conf /etc/supervisor/supervisord.conf.bak 2>/dev/null || true
+    echo "[supervisord]" | sudo tee /etc/supervisor/supervisord.conf >/dev/null
+    echo "minfds=200000" | sudo tee -a /etc/supervisor/supervisord.conf >/dev/null
+    echo "minfds=200000 added to supervisord.conf"
+else
     echo "minfds=200000 already exists in supervisord.conf"
-else
-    # Backup original supervisor.conf file
-    sudo cp /etc/supervisor/supervisord.conf /etc/supervisor/supervisord.conf.bak
-    
-    # Add "minfds=200000" to "[supervisord]" section in supervisor.conf
-    sudo sed -i '/\[supervisord\]/a minfds=200000' /etc/supervisor/supervisord.conf
-
-    # Restart Supervisor
-    sudo systemctl restart supervisor
-
-    echo "minfds=200000 added to supervisord.conf successfully!"
 fi
 
-# Check if "* soft nofile 200000" already exists in "limits.conf"
-if grep -q "* soft nofile 200000" /etc/security/limits.conf; then
-    echo "* soft nofile 200000 already exists in limits.conf"
-else
-    # Add "* soft nofile 200000" to "/etc/security/limits.conf"
+# Configure system limits
+if ! grep -q "* soft nofile 200000" /etc/security/limits.conf; then
     echo "* soft nofile 200000" | sudo tee -a /etc/security/limits.conf
-
-    # Add "* hard nofile 200000" to "/etc/security/limits.conf"
     echo "* hard nofile 200000" | sudo tee -a /etc/security/limits.conf
-
-    echo "Limits added to limits.conf successfully!"
+    echo "Limits added to limits.conf"
+else
+    echo "File descriptor limits already configured"
 fi
 
-
+# Restart supervisor
 sudo systemctl restart supervisor
 
 echo "Installation complete!"
-
