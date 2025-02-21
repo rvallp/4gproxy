@@ -45,7 +45,7 @@ case "$OS" in
     "Ubuntu"|"Debian")
         sudo apt-get update
         sudo apt-get upgrade -y
-        sudo apt-get install -y gnupg
+        sudo apt-get install -y gnupg curl
         ;;
     "CentOS")
         sudo yum update -y
@@ -55,16 +55,16 @@ esac
 # Install MongoDB
 case "$OS" in
     "Ubuntu")
-        wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
-        echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+        curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
         ;;
     "Debian")
-        wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
-        echo "deb http://repo.mongodb.org/apt/debian $(lsb_release -cs)/mongodb-org/5.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+        curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/debian $(lsb_release -cs)/mongodb-org/7.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
         ;;
     "CentOS")
-        sudo rpm --import https://www.mongodb.org/static/pgp/server-5.0.asc
-        echo -e "[mongodb-org-5.0]\nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/redhat/7Server/mongodb-org/5.0/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://www.mongodb.org/static/pgp/server-5.0.asc" | sudo tee /etc/yum.repos.d/mongodb-org-5.0.repo
+        sudo rpm --import https://www.mongodb.org/static/pgp/server-7.0.asc
+        echo -e "[mongodb-org-7.0]\nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/redhat/7Server/mongodb-org/7.0/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://www.mongodb.org/static/pgp/server-7.0.asc" | sudo tee /etc/yum.repos.d/mongodb-org-7.0.repo
         ;;
 esac
 
@@ -73,15 +73,37 @@ case "$OS" in
     "Ubuntu"|"Debian")
         sudo apt-get update
         sudo apt-get install -y mongodb-org
+        # Check for correct service name
+        if systemctl list-units --full -all | grep -q "mongod.service"; then
+            SERVICE_NAME="mongod"
+        elif systemctl list-units --full -all | grep -q "mongodb.service"; then
+            SERVICE_NAME="mongodb"
+        else
+            echo "Warning: No MongoDB service found. Attempting to use 'mongod'"
+            SERVICE_NAME="mongod"
+        fi
         ;;
     "CentOS")
         sudo yum install -y mongodb-org
+        SERVICE_NAME="mongod"
         ;;
 esac
 
-# Start MongoDB service
-sudo systemctl start mongod
-sudo systemctl enable mongod
+# Start and enable MongoDB service
+if systemctl list-units --full -all | grep -q "$SERVICE_NAME.service"; then
+    sudo systemctl start "$SERVICE_NAME"
+    sudo systemctl enable "$SERVICE_NAME"
+    if systemctl is-active "$SERVICE_NAME" >/dev/null; then
+        echo "MongoDB service ($SERVICE_NAME) started successfully"
+    else
+        echo "Error: Failed to start MongoDB service ($SERVICE_NAME)"
+        exit 1
+    fi
+else
+    echo "Error: MongoDB service unit ($SERVICE_NAME) not found"
+    echo "Please check MongoDB installation and service status manually"
+    exit 1
+fi
 
 # Install Supervisor
 case "$OS" in
@@ -94,7 +116,7 @@ case "$OS" in
 esac
 
 # Create Supervisor configuration
-sudo mkdir -p "$SPCONFDIR"  # Ensure directory exists
+sudo mkdir -p "$SPCONFDIR"
 cat << EOF | sudo tee "$SPCONFDIR/$CON_NAME"
 [program:allproxyS]
 directory=$ALLPDIR
@@ -108,14 +130,27 @@ stderr_logfile=/var/log/allproxys.err.log
 stdout_logfile=/var/log/allproxys.out.log
 EOF
 
-# Configure supervisor minfds
-if ! grep -q "minfds=200000" /etc/supervisor/supervisord.conf 2>/dev/null; then
-    sudo cp /etc/supervisor/supervisord.conf /etc/supervisor/supervisord.conf.bak 2>/dev/null || true
-    echo "[supervisord]" | sudo tee /etc/supervisor/supervisord.conf >/dev/null
-    echo "minfds=200000" | sudo tee -a /etc/supervisor/supervisord.conf >/dev/null
-    echo "minfds=200000 added to supervisord.conf"
+# Configure supervisor minfds without overwriting existing content
+SUPERVISOR_CONF="/etc/supervisor/supervisord.conf"
+if [ -f "$SUPERVISOR_CONF" ]; then
+    if ! grep -q "minfds=200000" "$SUPERVISOR_CONF" 2>/dev/null; then
+        sudo cp "$SUPERVISOR_CONF" "$SUPERVISOR_CONF.bak" 2>/dev/null || true
+        # If [supervisord] section exists, append minfds after it
+        if grep -q "\[supervisord\]" "$SUPERVISOR_CONF"; then
+            sudo sed -i "/\[supervisord\]/a minfds=200000" "$SUPERVISOR_CONF"
+        else
+            # If no [supervisord] section, append it with minfds
+            echo -e "\n[supervisord]\nminfds=200000" | sudo tee -a "$SUPERVISOR_CONF" >/dev/null
+        fi
+        echo "minfds=200000 added to supervisord.conf"
+    else
+        echo "minfds=200000 already exists in supervisord.conf"
+    fi
 else
-    echo "minfds=200000 already exists in supervisord.conf"
+    # If file doesn't exist, create it with basic content
+    echo "[supervisord]" | sudo tee "$SUPERVISOR_CONF" >/dev/null
+    echo "minfds=200000" | sudo tee -a "$SUPERVISOR_CONF" >/dev/null
+    echo "Created supervisord.conf with minfds=200000"
 fi
 
 # Configure system limits
