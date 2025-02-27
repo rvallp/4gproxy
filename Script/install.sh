@@ -25,11 +25,16 @@ if [ -f /etc/lsb-release ] || [ -f /etc/debian_version ]; then
         SPDIR="/etc/supervisor/"
         SPCONFDIR="/etc/supervisor/conf.d/"
         CON_NAME="allproxyS.conf"
+        # Get Ubuntu version
+        source /etc/lsb-release
+        UBUNTU_VERSION=$DISTRIB_CODENAME
     else
         OS="Debian"
         SPDIR="/etc/supervisor/"
         SPCONFDIR="/etc/supervisor/conf.d/"
         CON_NAME="allproxyS.conf"
+        # Get Debian version
+        DEBIAN_VERSION=$(cat /etc/debian_version | cut -d. -f1)
     fi
 elif [ -f /etc/redhat-release ]; then
     OS="CentOS"
@@ -55,18 +60,51 @@ esac
 # Install MongoDB
 case "$OS" in
     "Ubuntu")
-        curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
-        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+        # For Ubuntu, use MongoDB 7.0 for newer versions, 6.0 for older versions
+        if [[ "$UBUNTU_VERSION" == "jammy" || "$UBUNTU_VERSION" == "noble" ]]; then
+            # Ubuntu 22.04 (Jammy) or 24.04 (Noble) - use MongoDB 7.0
+            curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
+            echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+            MONGODB_VERSION="7.0"
+        else
+            # Older Ubuntu versions - use MongoDB 6.0
+            curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
+            echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+            MONGODB_VERSION="6.0"
+        fi
         ;;
     "Debian")
-        curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
-        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/debian $(lsb_release -cs)/mongodb-org/7.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+        # For Debian, use MongoDB 6.0 for Bullseye (11) and older, 7.0 for Bookworm (12) and newer
+        if [[ "$DEBIAN_VERSION" -ge 12 ]]; then
+            # Debian 12 (Bookworm) or newer - use MongoDB 7.0
+            curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
+            echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/debian $(lsb_release -cs)/mongodb-org/7.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+            MONGODB_VERSION="7.0"
+        else
+            # Debian 11 (Bullseye) or older - use MongoDB 6.0
+            curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
+            echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/debian $(lsb_release -cs)/mongodb-org/6.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+            MONGODB_VERSION="6.0"
+        fi
         ;;
     "CentOS")
-        sudo rpm --import https://www.mongodb.org/static/pgp/server-7.0.asc
-        echo -e "[mongodb-org-7.0]\nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/redhat/7Server/mongodb-org/7.0/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://www.mongodb.org/static/pgp/server-7.0.asc" | sudo tee /etc/yum.repos.d/mongodb-org-7.0.repo
+        # For CentOS, check version
+        CENTOS_VERSION=$(rpm -q --queryformat '%{VERSION}' centos-release)
+        if [[ "$CENTOS_VERSION" -ge 8 ]]; then
+            # CentOS 8 or newer - use MongoDB 7.0
+            sudo rpm --import https://www.mongodb.org/static/pgp/server-7.0.asc
+            echo -e "[mongodb-org-7.0]\nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/redhat/$CENTOS_VERSION/mongodb-org/7.0/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://www.mongodb.org/static/pgp/server-7.0.asc" | sudo tee /etc/yum.repos.d/mongodb-org-7.0.repo
+            MONGODB_VERSION="7.0"
+        else
+            # CentOS 7 - use MongoDB 6.0
+            sudo rpm --import https://www.mongodb.org/static/pgp/server-6.0.asc
+            echo -e "[mongodb-org-6.0]\nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/redhat/$CENTOS_VERSION/mongodb-org/6.0/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc" | sudo tee /etc/yum.repos.d/mongodb-org-6.0.repo
+            MONGODB_VERSION="6.0"
+        fi
         ;;
 esac
+
+echo "Installing MongoDB $MONGODB_VERSION..."
 
 # Install MongoDB package
 case "$OS" in
