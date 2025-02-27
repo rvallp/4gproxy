@@ -56,40 +56,48 @@ case "$OS" in
         sudo yum update -y
         ;;
 esac
-
 # Install MongoDB
 case "$OS" in
     "Ubuntu")
         # For Ubuntu, use MongoDB 7.0 for newer versions, 6.0 for older versions
         if [[ "$UBUNTU_VERSION" == "jammy" || "$UBUNTU_VERSION" == "noble" ]]; then
             # Ubuntu 22.04 (Jammy) or 24.04 (Noble) - use MongoDB 7.0
+            sudo rm -f /etc/apt/sources.list.d/mongodb-org-*.list
             curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
             echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
             MONGODB_VERSION="7.0"
         else
             # Older Ubuntu versions - use MongoDB 6.0
+            sudo rm -f /etc/apt/sources.list.d/mongodb-org-*.list
             curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
             echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
             MONGODB_VERSION="6.0"
         fi
         ;;
     "Debian")
-        # For Debian, use MongoDB 6.0 for Bullseye (11) and older, 7.0 for Bookworm (12) and newer
+        # For Debian, use MongoDB 4.4 for Bullseye (11), 7.0 for Bookworm (12) and newer
+        sudo rm -f /etc/apt/sources.list.d/mongodb-org-*.list
         if [[ "$DEBIAN_VERSION" -ge 12 ]]; then
             # Debian 12 (Bookworm) or newer - use MongoDB 7.0
             curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
             echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/debian $(lsb_release -cs)/mongodb-org/7.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
             MONGODB_VERSION="7.0"
+        elif [[ "$DEBIAN_VERSION" -eq 11 ]]; then
+            # Debian 11 (Bullseye) - use MongoDB 4.4
+            curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-4.4.gpg
+            echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-4.4.gpg ] https://repo.mongodb.org/apt/debian $(lsb_release -cs)/mongodb-org/4.4 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+            MONGODB_VERSION="4.4"
         else
-            # Debian 11 (Bullseye) or older - use MongoDB 6.0
-            curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
-            echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/debian $(lsb_release -cs)/mongodb-org/6.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
-            MONGODB_VERSION="6.0"
+            # Debian 10 (Buster) or older - use MongoDB 4.4
+            curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-4.4.gpg
+            echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-4.4.gpg ] https://repo.mongodb.org/apt/debian $(lsb_release -cs)/mongodb-org/4.4 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+            MONGODB_VERSION="4.4"
         fi
         ;;
     "CentOS")
         # For CentOS, check version
         CENTOS_VERSION=$(rpm -q --queryformat '%{VERSION}' centos-release)
+        sudo rm -f /etc/yum.repos.d/mongodb-org-*.repo
         if [[ "$CENTOS_VERSION" -ge 8 ]]; then
             # CentOS 8 or newer - use MongoDB 7.0
             sudo rpm --import https://www.mongodb.org/static/pgp/server-7.0.asc
@@ -127,20 +135,69 @@ case "$OS" in
         ;;
 esac
 
-# Start and enable MongoDB service
-if systemctl list-units --full -all | grep -q "$SERVICE_NAME.service"; then
-    sudo systemctl start "$SERVICE_NAME"
-    sudo systemctl enable "$SERVICE_NAME"
-    if systemctl is-active "$SERVICE_NAME" >/dev/null; then
-        echo "MongoDB service ($SERVICE_NAME) started successfully"
-    else
-        echo "Error: Failed to start MongoDB service ($SERVICE_NAME)"
-        exit 1
+# Fix MongoDB data directory permissions
+sudo mkdir -p /var/lib/mongodb
+sudo chown -R mongodb:mongodb /var/lib/mongodb
+sudo chmod 755 /var/lib/mongodb
+
+# Check if MongoDB configuration file exists and ensure it has correct settings
+if [ -f /etc/mongod.conf ]; then
+    # Ensure dbPath is set correctly
+    if ! grep -q "dbPath: /var/lib/mongodb" /etc/mongod.conf; then
+        sudo sed -i 's|dbPath:.*|dbPath: /var/lib/mongodb|' /etc/mongod.conf
     fi
+    
+    # Ensure bind_ip is set to allow connections
+    if grep -q "bindIp: 127.0.0.1" /etc/mongod.conf; then
+        sudo sed -i 's|bindIp: 127.0.0.1|bindIp: 0.0.0.0|' /etc/mongod.conf
+    fi
+fi
+
+# Start and enable MongoDB service
+echo "Starting MongoDB service..."
+sudo systemctl daemon-reload
+sudo systemctl stop "$SERVICE_NAME" 2>/dev/null || true
+sudo systemctl start "$SERVICE_NAME"
+
+# Check if MongoDB service started successfully
+if systemctl is-active "$SERVICE_NAME" >/dev/null; then
+    echo "MongoDB service ($SERVICE_NAME) started successfully"
+    sudo systemctl enable "$SERVICE_NAME"
 else
-    echo "Error: MongoDB service unit ($SERVICE_NAME) not found"
-    echo "Please check MongoDB installation and service status manually"
-    exit 1
+    echo "Error: Failed to start MongoDB service ($SERVICE_NAME)"
+    echo "Checking MongoDB logs for errors:"
+    sudo journalctl -u "$SERVICE_NAME" -n 20 --no-pager
+    
+    echo "Attempting to fix common issues and restart..."
+    
+    # Check if MongoDB lock file exists and remove it
+    if [ -f /var/lib/mongodb/mongod.lock ]; then
+        echo "Removing MongoDB lock file..."
+        sudo rm -f /var/lib/mongodb/mongod.lock
+    fi
+    
+    # Try to repair MongoDB database
+    echo "Attempting to repair MongoDB database..."
+    sudo -u mongodb mongod --repair --dbpath /var/lib/mongodb
+    
+    # Try starting MongoDB again
+    sudo systemctl start "$SERVICE_NAME"
+    
+    if systemctl is-active "$SERVICE_NAME" >/dev/null; then
+        echo "MongoDB service ($SERVICE_NAME) started successfully after repair"
+        sudo systemctl enable "$SERVICE_NAME"
+    else
+        echo "Error: Failed to start MongoDB service ($SERVICE_NAME) after repair"
+        echo "Please check MongoDB logs for errors:"
+        sudo journalctl -u "$SERVICE_NAME" -n 20 --no-pager
+        
+        echo "Would you like to continue with the installation without MongoDB? (y/n)"
+        read -r continue_without_mongodb
+        if [[ "$continue_without_mongodb" != "y" ]]; then
+            echo "Installation aborted."
+            exit 1
+        fi
+    fi
 fi
 
 # Install Supervisor
@@ -204,3 +261,6 @@ fi
 sudo systemctl restart supervisor
 
 echo "Installation complete!"
+echo "MongoDB version: $MONGODB_VERSION"
+echo "MongoDB service status: $(systemctl is-active $SERVICE_NAME)"
+echo "Supervisor status: $(systemctl is-active supervisor)"
