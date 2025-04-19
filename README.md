@@ -1,5 +1,18 @@
+## Important Notice: Account Security Update
+We regret to inform you that our primary Telegram account (@allproxyofficial) has been compromised. To ensure secure and uninterrupted communication, please contact us exclusively through our new Telegram account:
+
+Telegram ID: @bobking321
+
+What You Need to Know
+Do not send messages to the compromised account, as it may not be secure.
+For all inquiries, orders, or support, please reach out via bobking321 on Telegram.
+We are actively working to resolve this issue and enhance our security measures to prevent future incidents.
+
+Your trust and security are our top priorities. Thank you for your understanding and cooperation.
+
+
 ## Contact me
-1. To enhance your online security and improve browsing speed, consider setting up your own allproxy server. For personalized assistance and guidance, please feel free to reach out to me via Telegram at https://t.me/allproxyofficial. I'll be happy to help you get started and optimize your allproxy server configuration.
+1. To enhance your online security and improve browsing speed, consider setting up your own allproxy server. For personalized assistance and guidance, please feel free to reach out to me via Telegram at https://t.me/allproxyofficial   I'll be happy to help you get started and optimize your allproxy server configuration.
 2. Stay informed about the latest updates, news, and announcements related to allproxy by joining our official news channel on Telegram: https://t.me/allproxypub. By subscribing to this channel, you'll have access to timely information and valuable insights to make the most of your allproxy experience.
 
 
