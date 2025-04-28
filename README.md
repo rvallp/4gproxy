@@ -1,7 +1,7 @@
 
 ## Contact me
 1. To enhance your online security and improve browsing speed, consider setting up your own allproxy server. For personalized assistance and guidance, please feel free to reach out to me via Telegram at https://t.me/allproxyofficial   I'll be happy to help you get started and optimize your allproxy server configuration.
-2. Stay informed about the latest updates, news, and announcements related to allproxy by joining our official news channel on Telegram: https://t.me/allproxypub. By subscribing to this channel, you'll have access to timely information and valuable insights to make the most of your allproxy experience.
+2. Stay informed about the latest updates, news, and announcements related to allproxy by joining our official news channel on Telegram: https://t.me/allproxypub2 By subscribing to this channel, you'll have access to timely information and valuable insights to make the most of your allproxy experience.
 
 
 ## Install the server application files
